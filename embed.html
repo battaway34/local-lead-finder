@@ -6,63 +6,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Local Lead Finder</title>
     <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; padding:16px; background:#f6f7f9; }
-      .card { max-width: 640px; margin: 20px auto; background:#fff; border:1px solid #eee; border-radius:14px; box-shadow:0 6px 18px rgba(0,0,0,.06); padding:18px; }
-      h2 { margin: 0 0 8px; }
-      p.small { color:#666; margin: 6px 0 16px; }
+      /* Reset/structure */
+      *, *::before, *::after { box-sizing: border-box; }
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin:0; padding:20px; background:#f6f7f9; color:#111; }
+      .card { max-width: 720px; margin: 0 auto; background:#fff; border:1px solid #eee; border-radius:16px; box-shadow:0 8px 24px rgba(0,0,0,.06); padding:22px; }
+      h1 { font-size: 26px; margin: 0 0 6px; }
+      p.small { color:#666; margin: 0 0 18px; }
       label { display:block; margin: 12px 0 6px; font-weight: 600; }
-      input, select { width: 100%; padding: 10px; border:1px solid #ddd; border-radius:10px; background:#fff; }
-      .row { display:flex; gap:12px; }
-      .row > div { flex:1; }
-      button { margin-top: 16px; padding: 12px 16px; border:0; border-radius: 10px; background:#111; color:#fff; font-weight:700; cursor:pointer; }
-      pre { white-space: pre-wrap; background:#fafafa; border:1px solid #eee; padding:12px; border-radius:10px; margin-top:16px; }
+      input, select { width: 100%; padding: 12px; border:1px solid #ddd; border-radius:10px; background:#fff; font-size: 15px; }
+      input[type="checkbox"] { width:auto; margin-right:8px; }
+      .row { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+      .mt { margin-top: 14px; }
+      button { width:100%; margin-top: 18px; padding: 14px 16px; border:0; border-radius: 12px; background:#111; color:#fff; font-weight:700; font-size:16px; cursor:pointer; }
+      button:disabled { opacity: .7; cursor: not-allowed; }
+      pre { white-space: pre-wrap; background:#fafafa; border:1px solid #eee; padding:14px; border-radius:12px; margin-top:16px; line-height:1.4; }
       .hide { display:none; }
+      .pill { display:inline-block; background:#111; color:#fff; font-size:12px; padding:2px 8px; border-radius:999px; margin-left:6px; }
+      .help { font-size:12px; color:#666; margin-top:6px; }
+      @media (max-width: 640px){
+        .row { grid-template-columns: 1fr; }
+        .card { padding:16px; }
+        h1 { font-size: 22px; }
+      }
+      /* tidy checkbox list */
+      .checks { display:grid; grid-template-columns: 1fr 1fr; gap:10px 14px; }
+      @media (max-width: 480px){ .checks { grid-template-columns: 1fr; } }
+      .check { display:flex; align-items:center; }
     </style>
   </head>
   <body>
     <div class="card">
-      <h2>Get Your Local Lead Plan</h2>
-      <p class="small">Answer 60 seconds of questions. We’ll generate a plan tailored to your trade & city.</p>
+      <h1>Get Your Local Lead Plan</h1>
+      <p class="small">Answer ~60 seconds of questions. We’ll generate a plan tailored to your trade & city.</p>
 
       <div id="form">
         <label>Industry</label>
-        <select id="industry">
+        <select id="industry" aria-label="Industry">
           <option>Plumbing</option><option>Roofing</option><option>HVAC</option>
           <option>Landscaping</option><option>Solar</option><option>Pest Control</option>
           <option>Cleaning</option><option>Other</option>
         </select>
 
-        <div class="row">
-          <div><label>City</label><input id="city" placeholder="Clarksville" /></div>
-          <div><label>State</label><input id="state" placeholder="FL" /></div>
-        </div>
-
-        <div class="row">
-          <div><label>ZIP (optional)</label><input id="zip" placeholder="32430" /></div>
-          <div><label>Budget</label>
-            <select id="budget"><option>0–$500</option><option>$500–$2,000</option><option>$2,000+</option></select>
+        <div class="row mt">
+          <div>
+            <label>City</label>
+            <input id="city" placeholder="Clarksville" autocomplete="address-level2" />
+          </div>
+          <div>
+            <label>State</label>
+            <input id="state" placeholder="FL" autocomplete="address-level1" />
           </div>
         </div>
 
-        <label>Timeline</label>
-        <select id="timeline"><option>Need leads this week</option><option>Building pipeline is fine</option></select>
+        <div class="row mt">
+          <div>
+            <label>ZIP <span class="small" style="font-weight:400">(optional)</span></label>
+            <input id="zip" placeholder="32430" inputmode="numeric" pattern="[0-9]*" />
+          </div>
+          <div>
+            <label>Budget</label>
+            <select id="budget">
+              <option>0–$500</option><option>$500–$2,000</option><option>$2,000+</option>
+            </select>
+          </div>
+        </div>
 
-        <label>Current Channels (hold Cmd/Ctrl to multi-select)</label>
-        <select id="channels" multiple>
-          <option>LSA</option><option>Google Ads</option><option>SEO</option>
-          <option>FB/IG Ads</option><option>Referrals/Partners</option><option>Nothing yet</option>
+        <label class="mt">Timeline</label>
+        <select id="timeline">
+          <option>Need leads this week</option>
+          <option>Building pipeline is fine</option>
         </select>
 
-        <label>Primary Goal</label>
-        <select id="goal"><option>Phone calls</option><option>Booked appointments</option><option>Any</option></select>
-
-        <div class="row">
-          <div><label>First Name</label><input id="firstName" /></div>
-          <div><label>Last Name</label><input id="lastName" /></div>
+        <label class="mt">Current Channels <span class="pill">multi-select</span></label>
+        <div class="checks" id="channelsWrap">
+          <label class="check"><input type="checkbox" value="Google Local Services Ads (LSA)">Google Local Services Ads (LSA)</label>
+          <label class="check"><input type="checkbox" value="Google Ads">Google Ads (Search/PMAX)</label>
+          <label class="check"><input type="checkbox" value="SEO">SEO</label>
+          <label class="check"><input type="checkbox" value="Facebook/Instagram Ads">Facebook/Instagram Ads</label>
+          <label class="check"><input type="checkbox" value="Referrals/Partners">Referrals/Partners</label>
+          <label class="check"><input type="checkbox" value="Nothing yet">Nothing yet</label>
         </div>
-        <div class="row">
-          <div><label>Email</label><input id="email" /></div>
-          <div><label>Phone (optional)</label><input id="phone" /></div>
+        <div class="help">Tip: If none of these fit, leave them unchecked.</div>
+
+        <label class="mt">Primary Goal</label>
+        <select id="goal">
+          <option>Phone calls</option><option>Booked appointments</option><option>Any</option>
+        </select>
+
+        <div class="row mt">
+          <div>
+            <label>First Name</label>
+            <input id="firstName" autocomplete="given-name" />
+          </div>
+          <div>
+            <label>Last Name</label>
+            <input id="lastName" autocomplete="family-name" />
+          </div>
+        </div>
+
+        <div class="row mt">
+          <div>
+            <label>Email</label>
+            <input id="email" type="email" autocomplete="email" />
+          </div>
+          <div>
+            <label>Phone <span class="small" style="font-weight:400">(optional)</span></label>
+            <input id="phone" type="tel" autocomplete="tel" />
+          </div>
         </div>
 
         <button id="go">Generate My Plan</button>
@@ -74,10 +124,14 @@
 
     <script>
       const el = id => document.getElementById(id);
-      const go = el('go'), form = el('form'), loading = el('loading'), result = el('result');
+      const go = el('go'), loading = el('loading'), result = el('result');
+
+      function getCheckedChannels() {
+        return Array.from(document.querySelectorAll('#channelsWrap input[type="checkbox"]:checked'))
+          .map(c => c.value);
+      }
 
       go.addEventListener('click', async () => {
-        const channels = Array.from(el('channels').selectedOptions).map(o => o.value);
         const payload = {
           firstName: el('firstName').value.trim(),
           lastName: el('lastName').value.trim(),
@@ -89,12 +143,19 @@
           zip: el('zip').value.trim(),
           budget: el('budget').value,
           timeline: el('timeline').value,
-          channelsUsed: channels,
+          channelsUsed: getCheckedChannels(),
           primaryGoal: el('goal').value
         };
 
+        // basic guard on required fields
+        if (!payload.industry || !payload.city || !payload.state || !payload.email) {
+          alert('Please fill Industry, City, State, and Email.');
+          return;
+        }
+
         result.classList.add('hide');
         loading.classList.remove('hide');
+        go.disabled = true;
 
         try {
           const r = await fetch('/api/local-lead-plan', {
@@ -111,6 +172,8 @@
           result.classList.remove('hide');
         } finally {
           loading.classList.add('hide');
+          go.disabled = false;
+          result.scrollIntoView({ behavior: 'smooth' });
         }
       });
     </script>
