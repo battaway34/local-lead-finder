@@ -60,7 +60,7 @@ Keep it punchy, specific, and immediately usable THIS WEEK.
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "gpt-5", // or "gpt-4o-mini" if gpt-5 isn't enabled in your API account
+        model: "gpt-4o-mini",
         temperature: 0.7,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
